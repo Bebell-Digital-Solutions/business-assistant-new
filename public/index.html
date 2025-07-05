@@ -1,689 +1,581 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Business Assistant - Powered by Chatterbot</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mega-Bot AI Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'brand-pink': '#DF1783',
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          }
         }
-        
-        :root {
-            /* Dark mode colors */
-            --text-color: #E3E3E3;
-            --subheading-color: #828282;
-            --placeholder-color: #A6A6A6;
-            --primary-color: #1a1a2e;
-            --secondary-color: #16213e;
-            --secondary-hover-color: #0f3460;
-            --accent-color: #4ecca3;
-            --error-color: #e55865;
-        }
-        
-        .light_mode {
-            /* Light mode colors */
-            --text-color: #222;
-            --subheading-color: #5a5a5a;
-            --placeholder-color: #6C6C6C;
-            --primary-color: #f8f9fa;
-            --secondary-color: #e9ecef;
-            --secondary-hover-color: #dee2e6;
-            --accent-color: #4ecca3;
-            --error-color: #e55865;
-        }
-        
-        body {
-            background: var(--primary-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: background 0.3s ease;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .header {
-            padding: 2rem 0;
-            text-align: center;
-        }
-        
-        .header .title {
-            font-size: 3rem;
-            background: linear-gradient(to right, var(--accent-color), #4285f4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-        
-        .header .subtitle {
-            font-size: 1.5rem;
-            color: var(--subheading-color);
-            margin-bottom: 2rem;
-        }
-        
-        .suggestion-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.25rem;
-            margin: 1rem auto 3rem;
-            max-width: 1100px;
-        }
-        
-        .suggestion {
-            cursor: pointer;
-            padding: 1.5rem;
-            border-radius: 12px;
-            background: var(--secondary-color);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .suggestion:hover {
-            transform: translateY(-5px);
-            background: var(--secondary-hover-color);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-        
-        .suggestion .text {
-            font-weight: 500;
-            color: var(--text-color);
-            flex-grow: 1;
-            margin-bottom: 1.5rem;
-        }
-        
-        .suggestion .icon {
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-self: flex-end;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: rgba(78, 204, 163, 0.1);
-            color: var(--accent-color);
-            font-size: 1.5rem;
-        }
-        
-        .chat-container {
-            display: flex;
-            flex: 1;
-            gap: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .chat-list {
-            flex: 1;
-            background: var(--secondary-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            height: 500px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        
-        .chat-list .message {
-            margin-bottom: 1.5rem;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .message-content {
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
-        }
-        
-        .message .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        
-        .user-avatar {
-            background: linear-gradient(135deg, #4285f4, #0f3460);
-            color: white;
-        }
-        
-        .bot-avatar {
-            background: linear-gradient(135deg, #4ecca3, #0f3460);
-            color: white;
-        }
-        
-        .message .text {
-            padding: 1rem;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.08);
-            max-width: 80%;
-            line-height: 1.5;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .message.outgoing .text {
-            background: rgba(66, 133, 244, 0.15);
-            border-top-left-radius: 0;
-        }
-        
-        .message.incoming .text {
-            background: rgba(78, 204, 163, 0.15);
-            border-top-right-radius: 0;
-        }
-        
-        .message.error .text {
-            background: rgba(229, 88, 101, 0.15);
-            color: var(--error-color);
-        }
-        
-        .message.loading .text {
-            display: none;
-        }
-        
-        .loading-indicator {
-            display: flex;
-            gap: 0.5rem;
-            padding: 1rem;
-        }
-        
-        .loading-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            animation: pulse 1.5s infinite ease-in-out;
-        }
-        
-        .loading-dot:nth-child(2) {
-            animation-delay: 0.3s;
-        }
-        
-        .loading-dot:nth-child(3) {
-            animation-delay: 0.6s;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-        }
-        
-        .typing-area {
-            background: var(--primary-color);
-            padding: 1.5rem 0;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .typing-form {
-            display: flex;
-            gap: 0.75rem;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        
-        .input-wrapper {
-            flex: 1;
-            position: relative;
-        }
-        
-        .typing-input {
-            width: 100%;
-            padding: 1.2rem 5rem 1.2rem 1.5rem;
-            border-radius: 50px;
-            border: none;
-            background: var(--secondary-color);
-            color: var(--text-color);
-            font-size: 1rem;
-            outline: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-        
-        .typing-input:focus {
-            box-shadow: 0 2px 15px rgba(78, 204, 163, 0.2);
-        }
-        
-        .typing-input::placeholder {
-            color: var(--placeholder-color);
-        }
-        
-        #send-message-button {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(78, 204, 163, 0.3);
-        }
-        
-        #send-message-button:hover {
-            background: #3db893;
-            transform: translateY(-50%) scale(1.05);
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        .action-button {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-color);
-            border: none;
-            font-size: 1.4rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        
-        .action-button:hover {
-            background: var(--secondary-hover-color);
-            transform: translateY(-2px);
-        }
-        
-        .disclaimer-text {
-            text-align: center;
-            font-size: 0.85rem;
-            margin-top: 1.5rem;
-            color: var(--subheading-color);
-            max-width: 1100px;
-            margin: 1.5rem auto 0;
-            padding: 0 1rem;
-            line-height: 1.6;
-        }
-        
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: var(--subheading-color);
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent-color);
-        }
-        
-        .api-info {
-            background: rgba(78, 204, 163, 0.1);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: var(--subheading-color);
-            border-left: 4px solid var(--accent-color);
-        }
-        
-        @media (max-width: 768px) {
-            .header .title {
-                font-size: 2.2rem;
-            }
-            
-            .header .subtitle {
-                font-size: 1.2rem;
-            }
-            
-            .suggestion-list {
-                grid-template-columns: 1fr;
-            }
-            
-            .chat-container {
-                flex-direction: column;
-            }
-            
-            .typing-form {
-                flex-direction: column;
-            }
-            
-            .action-buttons {
-                justify-content: center;
-            }
-            
-            .action-button {
-                width: 50px;
-                height: 50px;
-            }
-        }
-        
-        /* Scrollbar styling */
-        .chat-list::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .chat-list::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
-            border-radius: 4px;
-        }
-        
-        .chat-list::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 4px;
-        }
-        
-        .chat-list::-webkit-scrollbar-thumb:hover {
-            background: #3db893;
-        }
-    </style>
-
-    
-        <script type="module" src="/src/chatbot.js"></script>
-
+      }
+    }
+  </script>
+  <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      /* Loading animation for bot message placeholders */
+      @keyframes loading-anim {
+          0% { background-position: -800px 0; }
+          100% { background-position: 800px 0; }
+      }
+      .loading-bar-anim {
+          background: linear-gradient(to right, #DF1783, #e2e8f0, #DF1783);
+          background-size: 800px 100%;
+          animation: loading-anim 3s linear infinite;
+      }
+      .dark .loading-bar-anim {
+          background: linear-gradient(to right, #DF1783, #1f2937, #DF1783);
+          background-size: 800px 100%;
+          animation: loading-anim 3s linear infinite;
+      }
+      /* Markdown content styling */
+      .markdown-content p { margin-bottom: 1rem; }
+      .markdown-content ul, .markdown-content ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style: revert; }
+      .markdown-content h1, .markdown-content h2, .markdown-content h3 { font-weight: 600; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+      .markdown-content h1 { font-size: 1.875rem; }
+      .markdown-content h2 { font-size: 1.5rem; }
+      .markdown-content h3 { font-size: 1.25rem; }
+      .markdown-content code {
+          background-color: #f1f1f1;
+          padding: 0.2em 0.4em;
+          font-size: 85%;
+          border-radius: 6px;
+          font-family: monospace;
+      }
+      .dark .markdown-content code { background-color: #374151; }
+      .markdown-content pre { background-color: #f1f1f1; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+      .dark .markdown-content pre { background-color: #1f2937; }
+      .markdown-content pre code { background-color: transparent; padding: 0; font-size: 100%; border-radius: 0; }
+      .markdown-content a { color: #DF1783; text-decoration: underline; }
+      .markdown-content blockquote { border-left: 4px solid #ccc; padding-left: 1rem; margin-left: 0; font-style: italic; color: #6b7280; }
+      .dark .markdown-content blockquote { border-left-color: #4b5563; color: #9ca3af; }
+  </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "@google/genai": "https://esm.sh/@google/genai@0.15.0",
+    "react-markdown": "https://esm.sh/react-markdown@9.0.1",
+    "remark-gfm": "https://esm.sh/remark-gfm@4.0.0"
+  }
+}
+</script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1 class="title">AIBA: </h1>
-            <p class="subtitle">Your AI Business Assistant</p>
-            
-            <ul class="suggestion-list">
-                <li class="suggestion">
-                    <h4 class="text">Help me plan a game night with my 5 best friends for under $100.</h4>
-                    <span class="icon material-symbols-rounded">draw</span>
-                </li>
-                <li class="suggestion">
-                    <h4 class="text">What are the best tips to improve my public speaking skills?</h4>
-                    <span class="icon material-symbols-rounded">lightbulb</span>
-                </li>
-                <li class="suggestion">
-                    <h4 class="text">Can you help me find the latest news on web development?</h4>
-                    <span class="icon material-symbols-rounded">explore</span>
-                </li>
-                <li class="suggestion">
-                    <h4 class="text">Write JavaScript code to sum all elements in an array.</h4>
-                    <span class="icon material-symbols-rounded">code</span>
-                </li>
-            </ul>
-        </header>
+<body class="font-sans bg-white dark:bg-gray-900 transition-colors duration-300">
+  <div id="root"></div>
+  <script type="text/babel" data-type="module">
+    import React, { useState, useCallback, useEffect, useRef } from 'react';
+    import ReactDOM from 'react-dom/client';
+    import { GoogleGenAI } from "@google/genai";
+    import ReactMarkdown from 'react-markdown';
+    import remarkGfm from 'remark-gfm';
+
+    // --- TYPES ---
+    const MessageSender = {
+      USER: 'user',
+      BOT: 'bot',
+    };
+
+    // --- CONSTANTS ---
+    const SUGGESTIONS = [
+        { text: "Outline a digital marketing strategy for a new e-commerce store.", icon: "store" },
+        { text: "What are the key elements of a successful SaaS landing page?", icon: "web" },
+        { text: "Generate 5 blog post ideas for a content marketing agency.", icon: "lightbulb_outline" },
+        { text: "Explain SEO best practices for a small business website in 2024.", icon: "trending_up" },
+    ];
+    const MASTER_PROMPT = `You are an expert online business development assistant named Mega-Bot.
+    Your goal is to provide actionable advice, strategies, and insights for entrepreneurs and businesses looking to grow online.
+    Your responses should be practical, clear, and well-structured using markdown.`;
+
+    // --- GEMINI SERVICE ---
+    let ai = null;
+    let chat = null;
+
+    const initializeGeminiService = (apiKey) => {
+        if (!apiKey) throw new Error("Initialization failed: API key is missing.");
+        ai = new GoogleGenAI({ apiKey });
+        chat = ai.chats.create({
+            model: 'gemini-2.5-flash-preview-04-17',
+            config: { systemInstruction: MASTER_PROMPT },
+        });
+    };
+
+    const sendMessageToGeminiStream = async (message, fileContext) => {
+        if (!chat) throw new Error("Gemini service is not initialized.");
+
+        let fullPrompt = message;
+        if (fileContext) {
+            fullPrompt = `Please use the following context from user-uploaded files to inform your answer.\n---\nSTART OF FILE CONTEXT\n${fileContext}\nEND OF FILE CONTEXT\n---\nUser Prompt: ${message}`;
+        }
+        return await chat.sendMessageStream(fullPrompt);
+    };
+
+    const resetChat = () => {
+        if (ai) {
+            chat = ai.chats.create({
+                model: 'gemini-2.5-flash-preview-04-17',
+                config: { systemInstruction: MASTER_PROMPT },
+            });
+        } else {
+            chat = null;
+        }
+    };
+
+    // --- HOOKS ---
+    const useTheme = () => {
+        const [theme, setTheme] = useState(() => {
+            const savedTheme = localStorage.getItem("mega-bot-theme");
+            if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+            return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        });
+
+        const toggleTheme = useCallback(() => {
+            setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+        }, []);
+
+        useEffect(() => {
+            const root = window.document.documentElement;
+            root.classList.toggle('dark', theme === 'dark');
+            localStorage.setItem('mega-bot-theme', theme);
+        }, [theme]);
+
+        return [theme, toggleTheme];
+    };
+
+    // --- ICONS ---
+    const BotIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-brand-pink">
+            <path fillRule="evenodd" d="M4.5 3.75a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V6.75a3 3 0 0 0-3-3h-15Zm4.125 3.375a.75.75 0 0 0 0 1.5h6.75a.75.75 0 0 0 0-1.5h-6.75Zm0 3.75a.75.75 0 0 0 0 1.5h6.75a.75.75 0 0 0 0-1.5h-6.75Zm-2.625 3.375a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm12 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z" clipRule="evenodd" />
+        </svg>
+    );
+    const UserIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-gray-500 dark:text-gray-400">
+            <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
+        </svg>
+    );
+
+    // --- COMMON COMPONENTS ---
+    const LoadingIndicator = () => (
+        <div className="flex flex-col gap-2 w-full">
+            <div className="loading-bar-anim h-3 rounded-sm w-full"></div>
+            <div className="loading-bar-anim h-3 rounded-sm w-4/5"></div>
+            <div className="loading-bar-anim h-3 rounded-sm w-3/5"></div>
+        </div>
+    );
+    
+    const IconButton = ({ onClick, icon, label, disabled = false, className = '' }) => (
+        <button
+            type="button"
+            onClick={onClick}
+            aria-label={label}
+            disabled={disabled}
+            className={`w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-full bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        >
+            <span className="material-symbols-rounded text-2xl">{icon}</span>
+        </button>
+    );
+    
+    // --- FEATURE COMPONENTS ---
+     const ApiKeyModal = ({ onSave, onDelete, onClose, currentKey }) => {
+        const [key, setKey] = useState(currentKey || '');
         
-        <div class="chat-container">
-            <div class="chat-list" id="chat-list">
-              
-                <!-- Chat messages will appear here -->
-                <div class="message incoming">
-                    <div class="message-content">
-                        <div class="avatar bot-avatar">ABA</div>
-                        <div class="text">
-                            Hello! I'm AIBA, your AI Business Assistant powered by Synergy Business Hub. How can I assist you today?
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          if (!key.trim()) return;
+          onSave(key.trim());
+          onClose();
+        };
+
+        const handleDelete = () => {
+            onDelete();
+            onClose();
+        };
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg">
+                    <header className="p-5 border-b border-slate-200 dark:border-gray-700 flex justify-between items-center">
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Manage API Key</h2>
+                        <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-700">
+                            <span className="material-symbols-rounded text-gray-600 dark:text-gray-300">close</span>
+                        </button>
+                    </header>
+                    <form onSubmit={handleSubmit}>
+                        <div className="p-6">
+                            <p className="text-gray-600 dark:text-gray-400 mb-6">Your Google Gemini API key is stored in your browser's local storage and is never sent to our servers.</p>
+                            <input type="password" value={key} onChange={e => setKey(e.target.value)} placeholder="Paste your API key here" className="w-full h-12 px-4 rounded-lg bg-slate-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-pink" />
+                            <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-brand-pink hover:underline">Get your API key from Google AI Studio</a>
+                            </div>
                         </div>
+                        <footer className="px-6 py-4 bg-slate-50 dark:bg-gray-800/50 border-t border-slate-200 dark:border-gray-700 flex justify-between items-center">
+                            {currentKey ? (
+                                <button type="button" onClick={handleDelete} className="px-4 py-2 text-sm bg-red-600/10 text-red-600 dark:text-red-400 rounded-full font-semibold hover:bg-red-600/20 transition-colors">Delete Key</button>
+                            ) : <div></div>}
+                            <button type="submit" disabled={!key.trim()} className="px-6 py-2.5 bg-brand-pink text-white rounded-full font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                                {currentKey ? 'Update Key' : 'Save and Start Chatting'}
+                            </button>
+                        </footer>
+                    </form>
+                </div>
+            </div>
+        );
+    };
+
+    const ChatMessage = ({ message }) => {
+        const [copyIcon, setCopyIcon] = useState('content_copy');
+        const isBot = message.sender === MessageSender.BOT;
+        const isLoading = isBot && message.text === '' && !message.isError;
+
+        const handleCopy = () => {
+            if (message.text) {
+                navigator.clipboard.writeText(message.text);
+                setCopyIcon('done');
+                setTimeout(() => setCopyIcon('content_copy'), 1500);
+            }
+        };
+
+        const messageContentClass = message.isError ? 'text-red-500' : 'text-gray-800 dark:text-gray-200';
+
+        return (
+            <div className="group mb-6">
+                <div className="flex items-start gap-4 max-w-4xl mx-auto">
+                    <div className="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center bg-slate-100 dark:bg-gray-800">
+                        {isBot ? <BotIcon /> : <UserIcon />}
+                    </div>
+                    <div className="flex-1 pt-1.5 min-w-0">
+                        {isLoading ? <LoadingIndicator /> : (
+                            <div className={`markdown-content ${messageContentClass}`}>
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
+                            </div>
+                        )}
+                    </div>
+                    {isBot && !isLoading && !message.isError && (
+                        <button onClick={handleCopy} className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400">
+                            <span className="material-symbols-rounded text-lg">{copyIcon}</span>
+                        </button>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    const ChatView = ({ messages }) => {
+        const chatEndRef = useRef(null);
+        useEffect(() => {
+            chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, [messages]);
+
+        return (
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-4">
+                <div className="max-w-4xl mx-auto">
+                    {messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+                    <div ref={chatEndRef} />
+                </div>
+            </div>
+        );
+    };
+
+    const SuggestionCard = ({ text, icon, onClick }) => (
+        <div onClick={onClick} className="group cursor-pointer p-5 flex-shrink-0 w-56 h-56 flex flex-col justify-between rounded-2xl bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 transition-colors duration-200">
+            <h4 className="text-base font-medium text-gray-800 dark:text-gray-200">{text}</h4>
+            <div className="self-end w-11 h-11 flex items-center justify-center rounded-full bg-white dark:bg-gray-900 group-hover:bg-brand-pink transition-all duration-300">
+                <span className="material-symbols-rounded text-2xl text-gray-600 dark:text-gray-300 group-hover:text-white transition-colors duration-300">{icon}</span>
+            </div>
+        </div>
+    );
+    
+    const Header = ({ onSuggestionClick }) => (
+        <header className={'flex-1 overflow-y-auto px-4 pt-16 pb-8 sm:pt-24 lg:pt-28'}>
+            <div className="max-w-4xl mx-auto">
+                <div>
+                    <h1 className="text-5xl sm:text-6xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-brand-pink to-purple-500">Hello, there</h1>
+                    <p className="text-4xl sm:text-5xl font-medium text-gray-400 dark:text-gray-500 mt-2">How can I help you today?</p>
+                </div>
+                <div className="mt-16 sm:mt-24">
+                    <div className="flex gap-5 pb-4 -mx-4 px-4 overflow-x-auto">
+                        {SUGGESTIONS.map((s, i) => <SuggestionCard key={i} {...s} onClick={() => onSuggestionClick(s.text)} />)}
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="typing-area">
-        <form class="typing-form" id="typing-form">
-            <div class="input-wrapper">
-                <input type="text" placeholder="Enter your message here..." class="typing-input" id="message-input" required />
-                <button type="submit" id="send-message-button" class="material-symbols-rounded">send</button>
-            </div>
-            <div class="action-buttons">
-                <button type="button" id="theme-toggle-button" class="action-button material-symbols-rounded">dark_mode</button>
-                <button type="button" id="delete-chat-button" class="action-button material-symbols-rounded">delete</button>
-            </div>
-        </form>
-        
-        <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span>Connected to Chatterbot</span>
-        </div>
-        
-        <p class="disclaimer-text">
-            AIBA may display inaccurate information, so please double-check critical responses. 
-            Developed by Bebell Digital Solutions. Powered by Chatterbot.
-        </p>
-        
-        <div class="api-info container">
-            <strong>API Status:</strong> Using Chatterbot API v1 with your provided chatbot key. 
-            Messages are being sent to: https://api.newoaks.ai/v1/chat/message
-        </div>
-    </div>
-    
-    <script>
-        // API Configuration
-        const NEWOAKS_API_KEY = "psuuogkAYuQMowxWBxiTheviUeKiYIk3BY9NkZg8fzgGONBUAb3cHfZoNgEMx5Aql5zh+XgcCPyf0+bkIkxrsKt/1Ebfbxebrg2AstHCUcBDvjjZQDA6ZNHSxLd90/wvhUBoPa21pSLOnVq9slfAM6USUoHGCMuaqs9QgMm4id0b9moF3Qi038LFS5tTT1sTGJEm4eja8xs+XX6li2pNT7eWzf5DiXGTsOqvH/rmBnv+R7eXs4Xjojja+PtL1uO0bVpmmtcwgigrnTvNSUN/zzfT/+iwSXvKQDDq2/ZANgyxuCGuMJZ4PVjELzAqs3E5xwDIazvsrglwxcL6guN1WgEYLwbsET9p4L27RbQgi/uAvjG8oN0eynd+fkh3Ja2axbPgUw1am5ocfdmn682+AEGjaXkt5NpD9az31SVBaogdmUjYUaeCsfulbFS7T/2BPxEMF8SR21KKfVZWafGT8HShbljCz0khyIUaZfpcL7d4IXSa7CGG8NlFmcwV9mBI63ooUK+Or2lqTHbn47Akk0zp7Y+Q2CIdAq8udNd9LP5M/BYHfxOliqEQzpJ4imS4J9ehgYwF6LUsERB6eMhPgAKuzuHzQCS2YG4XHWTStkgoCySViWQpe8mGCYhgeRJOm/vBdyzZ4eBAPoAb2Pq2QNLGM+/E7OoqguRG+ZrfqSMDDox0FD9XRpT/gL7ay96pzUjgHmquHz1NpmOa7PqhWKRj86D9PcFlBnKNKp70wXjRUGCGkfqR97yyGsUJR6CDF5GDvdD3fqWfsapqxxt34eTTIrjR3RsmL2GMGJBVZly9t48ULrdcJA1zz+3Oy+oHRKPAZys3CXH0aLHWgBfJWnXac1dtWMYLTjQPRilyZt7bOHjm993n1VJMhyzT/CzpdLLWx2F/X4rqIlZa7Q+keUWn/4WwYXlIs30Qe6WbS86oXW/IDNgTeCeVMg7irHoHYQPgB2oxLkUIKU7z/13gFc7oKAmfa6GnY8xu8fV02xvEw8e6pO/D1ssU9tLWA3mifAVtNK221wzBvjemtLpozGZO5fx3cJVW/1s3dN+cm2lWXS4+vhBPZZa4cCeVvIr/bDrYK1IRgdIlg57UivzEAZowNvS9iW0+OZ4kdWlABgeDQ/nFdYFJ3malcI3B7Of/BXOka1oV4DQKMlUhoIuMF4lKgJxfgSzK0gfZvGV5Ai8YXNDmSl+di9rF7WH1WRpgR1eLxVhAW8O2z1ZszaJCTh+IyhCzTGId5fX9wojs3/lJdZRz4tTKAujJ2qiMw6Rud6VYX3xCWIvwoYqfBr1XltyfWklRekkZ/HevOq+X9hxKXpb7gQRESBYAqkXFs4l45EzkN1KYZ23eZmIiqyGC3Xbfq18zNCWvFXMsdy7wyO8dfHbRSUrbuwMmishhrGps8L677ts1QHm5sGtzkOOat1QZ0R94orXYOKxqVktEO8I=";
-        const CREATE_SESSION_URL = "https://api.newoaks.ai/v1/chat/session";
-        const SEND_MESSAGE_URL = "https://api.newoaks.ai/v1/chat/message";
-        
-        // DOM Elements
-        const chatList = document.getElementById("chat-list");
-        const typingForm = document.getElementById("typing-form");
-        const messageInput = document.getElementById("message-input");
-        const themeToggleButton = document.getElementById("theme-toggle-button");
-        const deleteChatButton = document.getElementById("delete-chat-button");
-        const suggestions = document.querySelectorAll(".suggestion");
-        
-        // State variables
-        let sessionId = null;
-        let isResponseGenerating = false;
-        let chatHistory = [];
-        
-        // Initialize the chatbot
-        const initChatbot = async () => {
-            try {
-                // Create a new session
-                const response = await fetch(CREATE_SESSION_URL, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${NEWOAKS_API_KEY}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        chatbot_id: "mega-bot-ai"
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Failed to create session: ${response.status}`);
+        </header>
+    );
+
+    const FileUploadModal = ({ uploadedFiles, setUploadedFiles, onClose }) => {
+        const [error, setError] = useState(null);
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+        const handleFileChange = useCallback(e => {
+            const files = e.target.files;
+            if (!files) return;
+            setError(null);
+            Array.from(files).forEach(file => {
+                if (file.size > MAX_FILE_SIZE) {
+                    setError(`File "${file.name}" is too large (max 5MB).`);
+                    return;
                 }
-                
-                const data = await response.json();
-                sessionId = data.session_id;
-                console.log("New session created:", sessionId);
-            } catch (error) {
-                console.error("Error creating session:", error);
-                addMessageToChat("Failed to initialize chatbot session. Please try again later.", "error");
-            }
-        };
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if(event.target?.result) {
+                        setUploadedFiles(prev => [...prev.filter(f => f.name !== file.name), { name: file.name, content: event.target.result }]);
+                    }
+                };
+                reader.onerror = () => setError(`Error reading file "${file.name}".`);
+                reader.readAsText(file);
+            });
+        }, [setUploadedFiles]);
         
-        // Add message to chat
-        const addMessageToChat = (text, type = "incoming", isLoading = false) => {
-            const messageDiv = document.createElement("div");
-            messageDiv.classList.add("message", type);
-            
-            if (isLoading) {
-                messageDiv.classList.add("loading");
-                messageDiv.innerHTML = `
-                    <div class="message-content">
-                        <div class="avatar bot-avatar">MB</div>
-                        <div class="text">${text}</div>
-                        <div class="loading-indicator">
-                            <div class="loading-dot"></div>
-                            <div class="loading-dot"></div>
-                            <div class="loading-dot"></div>
+        const removeFile = fileName => setUploadedFiles(prev => prev.filter(f => f.name !== fileName));
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                    <header className="p-5 border-b border-slate-200 dark:border-gray-700 flex justify-between items-center">
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Upload Files for Context</h2>
+                        <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-gray-700"><span className="material-symbols-rounded text-gray-600 dark:text-gray-300">close</span></button>
+                    </header>
+                    <div className="p-6 flex-1 overflow-y-auto">
+                        <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
+                            <span className="material-symbols-rounded text-5xl text-gray-400 dark:text-gray-500">cloud_upload</span>
+                            <p className="mt-2 text-gray-600 dark:text-gray-300">Drag & drop files here, or click to select</p>
+                            <input type="file" multiple onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".txt,.md,.json,.csv,.html,.js,.ts" />
+                        </div>
+                        {error && <p className="mt-4 text-center text-red-500">{error}</p>}
+                        <div className="mt-6">
+                            <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">Uploaded Files ({uploadedFiles.length})</h3>
+                            {uploadedFiles.length > 0 ? (
+                                <ul className="mt-3 space-y-2">{uploadedFiles.map(file => (
+                                    <li key={file.name} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-gray-700 rounded-lg">
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            <span className="material-symbols-rounded text-gray-500">description</span>
+                                            <span className="truncate text-sm text-gray-700 dark:text-gray-200">{file.name}</span>
+                                        </div>
+                                        <button onClick={() => removeFile(file.name)} className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50 text-red-500"><span className="material-symbols-rounded text-lg">delete</span></button>
+                                    </li>))}
+                                </ul>
+                            ) : (<p className="mt-3 text-sm text-gray-500 dark:text-gray-400">No files uploaded yet.</p>)}
                         </div>
                     </div>
-                `;
+                    <footer className="p-5 border-t border-slate-200 dark:border-gray-700 text-right">
+                        <button onClick={onClose} className="px-6 py-2.5 bg-brand-pink text-white rounded-full font-semibold hover:opacity-90 transition-opacity">Done</button>
+                    </footer>
+                </div>
+            </div>
+        );
+    };
+
+    const TypingArea = ({ onSendMessage, isLoading, theme, toggleTheme, onDeleteChat, onOpenUploadModal, onOpenApiKeyModal, isApiConfigured, uploadedFilesCount }) => {
+        const [inputValue, setInputValue] = useState('');
+
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            if (inputValue.trim() && isApiConfigured) {
+                onSendMessage(inputValue);
+                setInputValue('');
+            }
+        };
+
+        return (
+            <div className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-t border-slate-200 dark:border-gray-700">
+                <div className="max-w-4xl mx-auto px-4 pt-2 pb-4 sm:pb-4">
+                     {uploadedFilesCount > 0 && isApiConfigured && (
+                         <div className="flex justify-center mb-2">
+                             <button 
+                                 onClick={onOpenUploadModal} 
+                                 className="flex items-center gap-2 px-3 py-1.5 text-xs sm:text-sm bg-slate-100 dark:bg-gray-800 rounded-full hover:bg-slate-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"
+                                 aria-label={`View ${uploadedFilesCount} attached files`}
+                             >
+                                 <span className="material-symbols-rounded text-base">attachment</span>
+                                 <span>{uploadedFilesCount} file{uploadedFilesCount > 1 ? 's' : ''} in context</span>
+                             </button>
+                        </div>
+                    )}
+                    <div className="flex items-center gap-3">
+                         <IconButton onClick={onOpenApiKeyModal} icon="key" label="Manage API Key" className="hidden sm:flex" />
+                         <form onSubmit={handleSubmit} className="flex-1 relative">
+                            <input
+                                type="text"
+                                value={inputValue}
+                                onChange={e => setInputValue(e.target.value)}
+                                placeholder={isApiConfigured ? "Enter a prompt here..." : "Please set your API key to begin."}
+                                required
+                                disabled={isLoading || !isApiConfigured}
+                                className="w-full h-14 pl-6 pr-16 py-2 rounded-full bg-slate-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-pink transition disabled:opacity-70 disabled:cursor-not-allowed"
+                            />
+                            <button
+                                type="submit"
+                                disabled={isLoading || !isApiConfigured || !inputValue.trim()}
+                                className={`absolute right-0 top-0 h-14 w-14 flex items-center justify-center text-white rounded-full transition-transform transform ${inputValue.trim() && isApiConfigured ? 'scale-100' : 'scale-0'} ${isLoading ? 'bg-gray-500' : 'bg-brand-pink'} disabled:bg-gray-500`}
+                                aria-label="Send Message"
+                            >
+                                <span className="material-symbols-rounded">send</span>
+                            </button>
+                        </form>
+                        <div className="hidden sm:flex items-center gap-3">
+                            <IconButton onClick={onOpenUploadModal} icon="upload_file" label="Upload Files" disabled={isLoading || !isApiConfigured} />
+                            <IconButton onClick={toggleTheme} icon={theme === 'dark' ? 'light_mode' : 'dark_mode'} label="Toggle Theme" />
+                            <IconButton onClick={onDeleteChat} icon="delete" label="Delete Chat" disabled={isLoading || !isApiConfigured} />
+                        </div>
+                         <div className="sm:hidden flex">
+                           <IconButton onClick={onOpenApiKeyModal} icon="key" label="Manage API Key" />
+                         </div>
+                    </div>
+                    <p className="hidden sm:block text-center text-xs text-gray-400 dark:text-gray-500 mt-3 px-4">Mega-Bot may display inaccurate info. Always double-check its responses.</p>
+                </div>
+            </div>
+        );
+    };
+
+    // --- MAIN APP COMPONENT ---
+    const App = () => {
+        const [theme, toggleTheme] = useTheme();
+        const [messages, setMessages] = useState([]);
+        const [isLoading, setIsLoading] = useState(false);
+        const [isFileModalOpen, setFileModalOpen] = useState(false);
+        const [uploadedFiles, setUploadedFiles] = useState([]);
+        const [apiKey, setApiKey] = useState(null);
+        const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+
+        useEffect(() => {
+            const savedKey = localStorage.getItem('gemini-api-key');
+            if (savedKey) {
+                try {
+                  initializeGeminiService(savedKey);
+                  setApiKey(savedKey);
+                } catch(e) {
+                  console.error("Failed to initialize with saved key", e);
+                  localStorage.removeItem('gemini-api-key');
+                  setShowApiKeyModal(true);
+                }
             } else {
-                messageDiv.innerHTML = `
-                    <div class="message-content">
-                        <div class="avatar ${type === "outgoing" ? "user-avatar" : "bot-avatar"}">
-                            ${type === "outgoing" ? "U" : "MB"}
-                        </div>
-                        <div class="text">${text}</div>
-                    </div>
-                `;
+                setShowApiKeyModal(true);
             }
-            
-            chatList.appendChild(messageDiv);
-            chatList.scrollTop = chatList.scrollHeight;
-        };
-        
-        // Send message to Chatterbot API
-        const sendMessageToNewOaks = async (message) => {
-            if (!sessionId || isResponseGenerating) return;
-            
-            isResponseGenerating = true;
-            addMessageToChat("Processing your request...", "incoming", true);
-            
+        }, []);
+
+        const handleSaveApiKey = useCallback((key) => {
             try {
-                const response = await fetch(SEND_MESSAGE_URL, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${NEWOAKS_API_KEY}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        session_id: sessionId,
-                        message: message
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
+                initializeGeminiService(key);
+                setApiKey(key);
+                localStorage.setItem('gemini-api-key', key);
+                setShowApiKeyModal(false);
+            } catch (e) {
+                console.error("Failed to initialize on save", e);
+                // This catch is for synchronous errors in initialization, not for async validation
+            }
+        }, []);
+        
+        const handleDeleteApiKey = useCallback(() => {
+            localStorage.removeItem('gemini-api-key');
+            setApiKey(null);
+            ai = null;
+            chat = null;
+        }, []);
+
+        const handleSendMessage = useCallback(async (inputText) => {
+            if (isLoading || !inputText.trim()) return;
+            if (!apiKey) {
+                setShowApiKeyModal(true);
+                return;
+            }
+
+            setIsLoading(true);
+            const userMessage = { id: `user-${Date.now()}`, sender: MessageSender.USER, text: inputText };
+            const botPlaceholder = { id: `bot-${Date.now()}`, sender: MessageSender.BOT, text: '', isError: false };
+            setMessages(prev => [...prev, userMessage, botPlaceholder]);
+            
+            const fileContext = uploadedFiles.map(f => `File: ${f.name}\nContent:\n${f.content}`).join('\n\n');
+
+            try {
+                const stream = await sendMessageToGeminiStream(inputText, fileContext);
+                let fullResponse = "";
+                for await (const chunk of stream) {
+                    if (chunk?.text) {
+                        fullResponse += chunk.text;
+                        setMessages(prev => prev.map(m => m.id === botPlaceholder.id ? { ...m, text: fullResponse } : m));
+                    }
                 }
-                
-                const data = await response.json();
-                const aiResponse = data.response;
-                
-                // Remove loading indicator
-                chatList.removeChild(chatList.lastChild);
-                
-                // Add AI response
-                addMessageToChat(aiResponse, "incoming");
-                
-                // Update chat history
-                chatHistory.push({ role: "user", content: message });
-                chatHistory.push({ role: "assistant", content: aiResponse });
             } catch (error) {
                 console.error("Error sending message:", error);
-                
-                // Remove loading indicator
-                if (chatList.lastChild && chatList.lastChild.classList.contains("loading")) {
-                    chatList.removeChild(chatList.lastChild);
+                let errorMessage = "Sorry, an unexpected error occurred. Please try again.";
+                 if (error?.message?.includes('API key not valid') || error?.message?.includes('API_KEY_INVALID') || error.toString().includes('400')) {
+                    errorMessage = "Your API key appears to be invalid. Please update it to continue.";
+                    handleDeleteApiKey();
+                    setTimeout(() => setShowApiKeyModal(true), 1000);
                 }
-                
-                addMessageToChat("Sorry, I encountered an error processing your request. Please try again.", "error");
+                setMessages(prev => prev.map(m => m.id === botPlaceholder.id ? { ...m, text: errorMessage, isError: true } : m));
             } finally {
-                isResponseGenerating = false;
+                setIsLoading(false);
             }
-        };
+        }, [isLoading, uploadedFiles, apiKey, handleDeleteApiKey]);
         
-        // Handle form submission
-        const handleFormSubmit = (e) => {
-            e.preventDefault();
-            
-            const message = messageInput.value.trim();
-            if (!message) return;
-            
-            // Add user message to chat
-            addMessageToChat(message, "outgoing");
-            
-            // Send to Chatterbot API
-            sendMessageToNewOaks(message);
-            
-            // Clear input
-            messageInput.value = "";
-            messageInput.focus();
-        };
-        
-        // Toggle theme
-        const toggleTheme = () => {
-            document.body.classList.toggle("light_mode");
-            const isLightMode = document.body.classList.contains("light_mode");
-            themeToggleButton.textContent = isLightMode ? "dark_mode" : "light_mode";
-            localStorage.setItem("theme", isLightMode ? "light" : "dark");
-        };
-        
-        // Delete chat
-        const deleteChat = () => {
-            if (chatHistory.length === 0) return;
-            
-            if (confirm("Are you sure you want to clear the chat history?")) {
-                // Clear chat history and messages
-                chatHistory = [];
-                chatList.innerHTML = '';
-                
-                // Add initial bot message
-                addMessageToChat("Hello! I'm AIBA, your AI Business Assistant powered by Synergy Business Hub. How can I assist you today?", "incoming");
-                
-                // Reset session
-                initChatbot();
+        const handleDeleteChat = useCallback(() => {
+            if (messages.length > 0 && window.confirm("Are you sure you want to delete the chat history? This will start a new conversation.")) {
+                setMessages([]);
+                setUploadedFiles([]);
+                resetChat();
             }
-        };
-        
-        // Event listeners
-        typingForm.addEventListener("submit", handleFormSubmit);
-        themeToggleButton.addEventListener("click", toggleTheme);
-        deleteChatButton.addEventListener("click", deleteChat);
-        
-        // Handle suggestion clicks
-        suggestions.forEach(suggestion => {
-            suggestion.addEventListener("click", () => {
-                const text = suggestion.querySelector(".text").textContent;
-                messageInput.value = text;
-                handleFormSubmit(new Event('submit'));
-            });
-        });
-        
-        // Initialize
-        const init = () => {
-            // Load theme preference
-            const savedTheme = localStorage.getItem("theme");
-            if (savedTheme === "light") {
-                document.body.classList.add("light_mode");
-                themeToggleButton.textContent = "dark_mode";
-            }
-            
-            // Initialize chatbot
-            initChatbot();
-        };
-        
-        // Initialize when DOM is loaded
-        document.addEventListener("DOMContentLoaded", init);
-    </script>
+        }, [messages.length]);
+
+        return (
+            <>
+                <div className="flex flex-col h-screen max-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 pb-36 sm:pb-32">
+                    {messages.length === 0 ? (
+                        <Header onSuggestionClick={handleSendMessage} />
+                    ) : (
+                        <ChatView messages={messages} />
+                    )}
+                    <TypingArea
+                        onSendMessage={handleSendMessage}
+                        isLoading={isLoading}
+                        theme={theme}
+                        toggleTheme={toggleTheme}
+                        onDeleteChat={handleDeleteChat}
+                        onOpenUploadModal={() => setFileModalOpen(true)}
+                        onOpenApiKeyModal={() => setShowApiKeyModal(true)}
+                        isApiConfigured={!!apiKey}
+                        uploadedFilesCount={uploadedFiles.length}
+                    />
+                </div>
+                {showApiKeyModal && (
+                    <ApiKeyModal
+                        onSave={handleSaveApiKey}
+                        onDelete={handleDeleteApiKey}
+                        onClose={() => setShowApiKeyModal(false)}
+                        currentKey={apiKey}
+                    />
+                )}
+                {isFileModalOpen && (
+                    <FileUploadModal
+                        uploadedFiles={uploadedFiles}
+                        setUploadedFiles={setUploadedFiles}
+                        onClose={() => setFileModalOpen(false)}
+                    />
+                )}
+            </>
+        );
+    };
+
+    // --- RENDER THE APP ---
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<React.StrictMode><App /></React.StrictMode>);
+  </script>
 </body>
 </html>
