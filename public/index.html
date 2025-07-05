@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega-Bot AI - Powered by NewOaks</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+        
+        :root {
+            /* Dark mode colors */
+            --text-color: #E3E3E3;
+            --subheading-color: #828282;
+            --placeholder-color: #A6A6A6;
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --secondary-hover-color: #0f3460;
+            --accent-color: #4ecca3;
+            --error-color: #e55865;
+        }
+        
+        .light_mode {
+            /* Light mode colors */
+            --text-color: #222;
+            --subheading-color: #5a5a5a;
+            --placeholder-color: #6C6C6C;
+            --primary-color: #f8f9fa;
+            --secondary-color: #e9ecef;
+            --secondary-hover-color: #dee2e6;
+            --accent-color: #4ecca3;
+            --error-color: #e55865;
+        }
+        
+        body {
+            background: var(--primary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header {
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .header .title {
+            font-size: 3rem;
+            background: linear-gradient(to right, var(--accent-color), #4285f4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header .subtitle {
+            font-size: 1.5rem;
+            color: var(--subheading-color);
+            margin-bottom: 2rem;
+        }
+        
+        .suggestion-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+            margin: 1rem auto 3rem;
+            max-width: 1100px;
+        }
+        
+        .suggestion {
+            cursor: pointer;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: var(--secondary-color);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .suggestion:hover {
+            transform: translateY(-5px);
+            background: var(--secondary-hover-color);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .suggestion .text {
+            font-weight: 500;
+            color: var(--text-color);
+            flex-grow: 1;
+            margin-bottom: 1.5rem;
+        }
+        
+        .suggestion .icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-self: flex-end;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(78, 204, 163, 0.1);
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex: 1;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .chat-list {
+            flex: 1;
+            background: var(--secondary-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: 500px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .chat-list .message {
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-content {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .user-avatar {
+            background: linear-gradient(135deg, #4285f4, #0f3460);
+            color: white;
+        }
+        
+        .bot-avatar {
+            background: linear-gradient(135deg, #4ecca3, #0f3460);
+            color: white;
+        }
+        
+        .message .text {
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            max-width: 80%;
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .message.outgoing .text {
+            background: rgba(66, 133, 244, 0.15);
+            border-top-left-radius: 0;
+        }
+        
+        .message.incoming .text {
+            background: rgba(78, 204, 163, 0.15);
+            border-top-right-radius: 0;
+        }
+        
+        .message.error .text {
+            background: rgba(229, 88, 101, 0.15);
+            color: var(--error-color);
+        }
+        
+        .message.loading .text {
+            display: none;
+        }
+        
+        .loading-indicator {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .loading-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+        
+        .typing-area {
+            background: var(--primary-color);
+            padding: 1.5rem 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .typing-form {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .typing-input {
+            width: 100%;
+            padding: 1.2rem 5rem 1.2rem 1.5rem;
+            border-radius: 50px;
+            border: none;
+            background: var(--secondary-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .typing-input:focus {
+            box-shadow: 0 2px 15px rgba(78, 204, 163, 0.2);
+        }
+        
+        .typing-input::placeholder {
+            color: var(--placeholder-color);
+        }
+        
+        #send-message-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(78, 204, 163, 0.3);
+        }
+        
+        #send-message-button:hover {
+            background: #3db893;
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .action-button {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            border: none;
+            font-size: 1.4rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .action-button:hover {
+            background: var(--secondary-hover-color);
+            transform: translateY(-2px);
+        }
+        
+        .disclaimer-text {
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 1.5rem;
+            color: var(--subheading-color);
+            max-width: 1100px;
+            margin: 1.5rem auto 0;
+            padding: 0 1rem;
+            line-height: 1.6;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--subheading-color);
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-color);
+        }
+        
+        .api-info {
+            background: rgba(78, 204, 163, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--subheading-color);
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        @media (max-width: 768px) {
+            .header .title {
+                font-size: 2.2rem;
+            }
+            
+            .header .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .suggestion-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-container {
+                flex-direction: column;
+            }
+            
+            .typing-form {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+            
+            .action-button {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        /* Scrollbar styling */
+        .chat-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chat-list::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        
+        .chat-list::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+        
+        .chat-list::-webkit-scrollbar-thumb:hover {
+            background: #3db893;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Mega-Bot AI</h1>
+            <p class="subtitle">Your Intelligent Assistant Powered by NewOaks</p>
+            
+            <ul class="suggestion-list">
+                <li class="suggestion">
+                    <h4 class="text">Help me plan a game night with my 5 best friends for under $100.</h4>
+                    <span class="icon material-symbols-rounded">draw</span>
+                </li>
+                <li class="suggestion">
+                    <h4 class="text">What are the best tips to improve my public speaking skills?</h4>
+                    <span class="icon material-symbols-rounded">lightbulb</span>
+                </li>
+                <li class="suggestion">
+                    <h4 class="text">Can you help me find the latest news on web development?</h4>
+                    <span class="icon material-symbols-rounded">explore</span>
+                </li>
+                <li class="suggestion">
+                    <h4 class="text">Write JavaScript code to sum all elements in an array.</h4>
+                    <span class="icon material-symbols-rounded">code</span>
+                </li>
+            </ul>
+        </header>
+        
+        <div class="chat-container">
+            <div class="chat-list" id="chat-list">
+                <!-- Chat messages will appear here -->
+                <div class="message incoming">
+                    <div class="message-content">
+                        <div class="avatar bot-avatar">MB</div>
+                        <div class="text">
+                            Hello! I'm Mega-Bot, your AI assistant powered by NewOaks. How can I help you today?
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="typing-area">
+        <form class="typing-form" id="typing-form">
+            <div class="input-wrapper">
+                <input type="text" placeholder="Enter your message here..." class="typing-input" id="message-input" required />
+                <button type="submit" id="send-message-button" class="material-symbols-rounded">send</button>
+            </div>
+            <div class="action-buttons">
+                <button type="button" id="theme-toggle-button" class="action-button material-symbols-rounded">dark_mode</button>
+                <button type="button" id="delete-chat-button" class="action-button material-symbols-rounded">delete</button>
+            </div>
+        </form>
+        
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>Connected to NewOaks AI</span>
+        </div>
+        
+        <p class="disclaimer-text">
+            Mega-Bot may display inaccurate information, so please double-check critical responses. 
+            Developed by Bebell Digital Solutions. Powered by NewOaks AI.
+        </p>
+        
+        <div class="api-info container">
+            <strong>API Status:</strong> Using NewOaks API v1 with your provided chatbot key. 
+            Messages are being sent to: https://api.newoaks.ai/v1/chat/message
+        </div>
+    </div>
+    
+    <script>
+        // API Configuration
+        const NEWOAKS_API_KEY = "psuuogkAYuQMowxWBxiTheviUeKiYIk3BY9NkZg8fzgGONBUAb3cHfZoNgEMx5Aql5zh+XgcCPyf0+bkIkxrsKt/1Ebfbxebrg2AstHCUcBDvjjZQDA6ZNHSxLd90/wvhUBoPa21pSLOnVq9slfAM6USUoHGCMuaqs9QgMm4id0b9moF3Qi038LFS5tTT1sTGJEm4eja8xs+XX6li2pNT7eWzf5DiXGTsOqvH/rmBnv+R7eXs4Xjojja+PtL1uO0bVpmmtcwgigrnTvNSUN/zzfT/+iwSXvKQDDq2/ZANgyxuCGuMJZ4PVjELzAqs3E5xwDIazvsrglwxcL6guN1WgEYLwbsET9p4L27RbQgi/uAvjG8oN0eynd+fkh3Ja2axbPgUw1am5ocfdmn682+AEGjaXkt5NpD9az31SVBaogdmUjYUaeCsfulbFS7T/2BPxEMF8SR21KKfVZWafGT8HShbljCz0khyIUaZfpcL7d4IXSa7CGG8NlFmcwV9mBI63ooUK+Or2lqTHbn47Akk0zp7Y+Q2CIdAq8udNd9LP5M/BYHfxOliqEQzpJ4imS4J9ehgYwF6LUsERB6eMhPgAKuzuHzQCS2YG4XHWTStkgoCySViWQpe8mGCYhgeRJOm/vBdyzZ4eBAPoAb2Pq2QNLGM+/E7OoqguRG+ZrfqSMDDox0FD9XRpT/gL7ay96pzUjgHmquHz1NpmOa7PqhWKRj86D9PcFlBnKNKp70wXjRUGCGkfqR97yyGsUJR6CDF5GDvdD3fqWfsapqxxt34eTTIrjR3RsmL2GMGJBVZly9t48ULrdcJA1zz+3Oy+oHRKPAZys3CXH0aLHWgBfJWnXac1dtWMYLTjQPRilyZt7bOHjm993n1VJMhyzT/CzpdLLWx2F/X4rqIlZa7Q+keUWn/4WwYXlIs30Qe6WbS86oXW/IDNgTeCeVMg7irHoHYQPgB2oxLkUIKU7z/13gFc7oKAmfa6GnY8xu8fV02xvEw8e6pO/D1ssU9tLWA3mifAVtNK221wzBvjemtLpozGZO5fx3cJVW/1s3dN+cm2lWXS4+vhBPZZa4cCeVvIr/bDrYK1IRgdIlg57UivzEAZowNvS9iW0+OZ4kdWlABgeDQ/nFdYFJ3malcI3B7Of/BXOka1oV4DQKMlUhoIuMF4lKgJxfgSzK0gfZvGV5Ai8YXNDmSl+di9rF7WH1WRpgR1eLxVhAW8O2z1ZszaJCTh+IyhCzTGId5fX9wojs3/lJdZRz4tTKAujJ2qiMw6Rud6VYX3xCWIvwoYqfBr1XltyfWklRekkZ/HevOq+X9hxKXpb7gQRESBYAqkXFs4l45EzkN1KYZ23eZmIiqyGC3Xbfq18zNCWvFXMsdy7wyO8dfHbRSUrbuwMmishhrGps8L677ts1QHm5sGtzkOOat1QZ0R94orXYOKxqVktEO8I=";
+        const CREATE_SESSION_URL = "https://api.newoaks.ai/v1/chat/session";
+        const SEND_MESSAGE_URL = "https://api.newoaks.ai/v1/chat/message";
+        
+        // DOM Elements
+        const chatList = document.getElementById("chat-list");
+        const typingForm = document.getElementById("typing-form");
+        const messageInput = document.getElementById("message-input");
+        const themeToggleButton = document.getElementById("theme-toggle-button");
+        const deleteChatButton = document.getElementById("delete-chat-button");
+        const suggestions = document.querySelectorAll(".suggestion");
+        
+        // State variables
+        let sessionId = null;
+        let isResponseGenerating = false;
+        let chatHistory = [];
+        
+        // Initialize the chatbot
+        const initChatbot = async () => {
+            try {
+                // Create a new session
+                const response = await fetch(CREATE_SESSION_URL, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${NEWOAKS_API_KEY}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        chatbot_id: "mega-bot-ai"
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to create session: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                sessionId = data.session_id;
+                console.log("New session created:", sessionId);
+            } catch (error) {
+                console.error("Error creating session:", error);
+                addMessageToChat("Failed to initialize chatbot session. Please try again later.", "error");
+            }
+        };
+        
+        // Add message to chat
+        const addMessageToChat = (text, type = "incoming", isLoading = false) => {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", type);
+            
+            if (isLoading) {
+                messageDiv.classList.add("loading");
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="avatar bot-avatar">MB</div>
+                        <div class="text">${text}</div>
+                        <div class="loading-indicator">
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="avatar ${type === "outgoing" ? "user-avatar" : "bot-avatar"}">
+                            ${type === "outgoing" ? "U" : "MB"}
+                        </div>
+                        <div class="text">${text}</div>
+                    </div>
+                `;
+            }
+            
+            chatList.appendChild(messageDiv);
+            chatList.scrollTop = chatList.scrollHeight;
+        };
+        
+        // Send message to NewOaks API
+        const sendMessageToNewOaks = async (message) => {
+            if (!sessionId || isResponseGenerating) return;
+            
+            isResponseGenerating = true;
+            addMessageToChat("Processing your request...", "incoming", true);
+            
+            try {
+                const response = await fetch(SEND_MESSAGE_URL, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${NEWOAKS_API_KEY}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        message: message
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const aiResponse = data.response;
+                
+                // Remove loading indicator
+                chatList.removeChild(chatList.lastChild);
+                
+                // Add AI response
+                addMessageToChat(aiResponse, "incoming");
+                
+                // Update chat history
+                chatHistory.push({ role: "user", content: message });
+                chatHistory.push({ role: "assistant", content: aiResponse });
+            } catch (error) {
+                console.error("Error sending message:", error);
+                
+                // Remove loading indicator
+                if (chatList.lastChild && chatList.lastChild.classList.contains("loading")) {
+                    chatList.removeChild(chatList.lastChild);
+                }
+                
+                addMessageToChat("Sorry, I encountered an error processing your request. Please try again.", "error");
+            } finally {
+                isResponseGenerating = false;
+            }
+        };
+        
+        // Handle form submission
+        const handleFormSubmit = (e) => {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessageToChat(message, "outgoing");
+            
+            // Send to NewOaks API
+            sendMessageToNewOaks(message);
+            
+            // Clear input
+            messageInput.value = "";
+            messageInput.focus();
+        };
+        
+        // Toggle theme
+        const toggleTheme = () => {
+            document.body.classList.toggle("light_mode");
+            const isLightMode = document.body.classList.contains("light_mode");
+            themeToggleButton.textContent = isLightMode ? "dark_mode" : "light_mode";
+            localStorage.setItem("theme", isLightMode ? "light" : "dark");
+        };
+        
+        // Delete chat
+        const deleteChat = () => {
+            if (chatHistory.length === 0) return;
+            
+            if (confirm("Are you sure you want to clear the chat history?")) {
+                // Clear chat history and messages
+                chatHistory = [];
+                chatList.innerHTML = '';
+                
+                // Add initial bot message
+                addMessageToChat("Hello! I'm Mega-Bot, your AI assistant powered by NewOaks. How can I help you today?", "incoming");
+                
+                // Reset session
+                initChatbot();
+            }
+        };
+        
+        // Event listeners
+        typingForm.addEventListener("submit", handleFormSubmit);
+        themeToggleButton.addEventListener("click", toggleTheme);
+        deleteChatButton.addEventListener("click", deleteChat);
+        
+        // Handle suggestion clicks
+        suggestions.forEach(suggestion => {
+            suggestion.addEventListener("click", () => {
+                const text = suggestion.querySelector(".text").textContent;
+                messageInput.value = text;
+                handleFormSubmit(new Event('submit'));
+            });
+        });
+        
+        // Initialize
+        const init = () => {
+            // Load theme preference
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "light") {
+                document.body.classList.add("light_mode");
+                themeToggleButton.textContent = "dark_mode";
+            }
+            
+            // Initialize chatbot
+            initChatbot();
+        };
+        
+        // Initialize when DOM is loaded
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>
