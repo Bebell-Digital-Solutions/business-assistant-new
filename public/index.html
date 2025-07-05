@@ -562,7 +562,7 @@
             chatList.scrollTop = chatList.scrollHeight;
         };
         
-        // Send message to NewOaks API
+        // Send message to Chatterbot API
         const sendMessageToNewOaks = async (message) => {
             if (!sessionId || isResponseGenerating) return;
             
@@ -622,7 +622,7 @@
             // Add user message to chat
             addMessageToChat(message, "outgoing");
             
-            // Send to NewOaks API
+            // Send to Chatterbot API
             sendMessageToNewOaks(message);
             
             // Clear input
@@ -648,7 +648,7 @@
                 chatList.innerHTML = '';
                 
                 // Add initial bot message
-                addMessageToChat("Hello! I'm Mega-Bot, your AI assistant powered by NewOaks. How can I help you today?", "incoming");
+                addMessageToChat("Hello! I'm AIBA, your AI Business Assistant powered by Synergy Business Hub. How can I assist you today?", "incoming");
                 
                 // Reset session
                 initChatbot();
